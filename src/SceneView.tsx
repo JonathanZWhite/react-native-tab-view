@@ -15,6 +15,7 @@ type Props<T extends Route> = SceneRendererProps &
     index: number;
     children: (props: { loading: boolean }) => React.ReactNode;
     style?: StyleProp<ViewStyle>;
+    containerStyle?: StyleProp<ViewStyle>;
   };
 
 type State = {
@@ -102,11 +103,16 @@ export default class SceneView<T extends Route> extends React.Component<
   };
 
   render() {
-    const { navigationState, index, layout, style } = this.props;
+     const {
+      navigationState,
+      index,
+      layout,
+      containerStyle,
+      style: defaultStyle,
+    } = this.props;
     const { loading } = this.state;
 
     const focused = navigationState.index === index;
-
     return (
       <View
         accessibilityElementsHidden={!focused}
@@ -120,15 +126,15 @@ export default class SceneView<T extends Route> extends React.Component<
             : focused
             ? StyleSheet.absoluteFill
             : null,
-          style,
-          { position: undefined },
+          !focused && defaultStyle,
+          containerStyle,
         ]}
       >
-        {
+         {
           // Only render the route only if it's either focused or layout is available
           // When layout is not available, we must not render unfocused routes
           // so that the focused route can fill the screen
-          focused ? this.props.children({ loading }) : null
+          focused || layout.width ? this.props.children({ loading }) : null
         }
       </View>
     );
